@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Glam Salon – Book Your Appointment</title>
+  <link href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@600&display=swap" rel="stylesheet"/>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Gothic A1', sans-serif;
+      background-color: #FFEBCD;
+      color: #333;
+    }
+    header {
+      color: #000000;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.5em;
+    }
+    section {
+      padding: 40px 20px;
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, select, textarea {
+      padding: 10px;
+      margin-top: 5px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px;
+      font-size: 1.2em;
+      background-color: #EFAEEF;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #D8A9D9;
+    }
+    #formStatus {
+      margin-top: 10px;
+      color: red;
+    }
+    footer {
+      color: #000000;
+      text-align: center;
+      padding: 20px;
+      font-size: 0.9em;
+    }
+    .whatsapp-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #25D366;
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 20px;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+    }
+    .whatsapp-button:hover {
+      background-color: #1ebe5d;
+    }
+    .whatsapp-button img {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Welcome to Glam Salon</h1>
+  <p>Your beauty, our passion. Book your appointment today!</p>
+</header>
+
+<section>
+  <h2>Book an Appointment</h2>
+  <form id="bookingForm" autocomplete="off">
+    <label for="name">Full Name *</label>
+    <input type="text" id="name" name="name" required />
+
+    <label for="phone">Phone Number *</label>
+    <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" title="Enter a valid 10-digit number" required />
+
+    <label for="email">Email Address</label>
+    <input type="email" id="email" name="email" placeholder="you@example.com" />
+
+    <label for="service">Select Service *</label>
+    <select id="service" name="service" required>
+      <option value="">--Please choose an option--</option>
+      <option value="Haircut">Haircut</option>
+      <option value="Hair Coloring">Hair Coloring</option>
+      <option value="Facial">Facial</option>
+      <option value="Manicure/Pedicure">Manicure/Pedicure</option>
+      <option value="Skin Care Treatments">Skin Care Treatments</option>
+      <option value="Bridal Package">Bridal Package</option>
+    </select>
+
+    <label for="message">Additional Notes</label>
+    <textarea id="message" name="message" rows="4" placeholder="Any specific requests or questions?"></textarea>
+
+    <button type="submit">Submit</button>
+    <p id="formStatus"></p>
+  </form>
+</section>
+
+<script>
+  const form = document.getElementById('bookingForm');
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const data = {
+      name: form.name.value,
+      phone: form.phone.value,
+      email: form.email.value,
+      service: form.service.value,
+      message: form.message.value
+    };
+
+    // Send data to Google Sheet
+    fetch('https://script.google.com/macros/s/AKfycbw3sHntYX0uJyJK9INix9-sES_DlcFIfER-_DlLTRGywZRZ31Yb_bXLVxeLODsDuPeOww/exec', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+      if (result.result === 'success') {
+        // Send email
+        const mailBody = `
+          Name: ${data.name}%0D%0A
+          Phone: ${data.phone}%0D%0A
+          Email: ${data.email}%0D%0A
+          Service: ${data.service}%0D%0A
+          Message: ${data.message}
+        `;
+        window.location.href = `mailto:nahaskmr123@gmail.com?subject=New Appointment Request&body=${mailBody}`;
+        console.log(mailBody);
+
+        // Redirect to thank you page
+        setTimeout(() => {
+          window.location.href = 'thankyou1.html';
+        }, 1000);
+      } else {
+        document.getElementById('formStatus').innerText = 'Error! Please try again.';
+      }
+    })
+    .catch(error => {
+      console.error('Fetch error:', error);
+      document.getElementById('formStatus').innerText = 'Something went wrong. Please try again.';
+    });
+  });
+</script>
+
+<a class="whatsapp-button" href="https://wa.link/1cs3l7" target="_blank">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp Icon" />
+  Chat with us
+</a>
+
+<footer>
+  &copy; 2025 Glam Salon. All rights reserved.
+</footer>
+
+</body>
+</html>
